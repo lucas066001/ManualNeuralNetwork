@@ -11,11 +11,12 @@ class DenseLayer(LayerStruct):
 
     def activate(self, previous_layer_act):
         #Set base values in case of first iteration
-        if self.weights == None:
+        if self.weights is None:
             self.weights = np.random.randn(self.nb_neurons, len(previous_layer_act))
-        if self.biais == None:
-            self.biais = np.random.randn(self.nb_neurons)
-
+        if self.biais is None:
+            self.biais = np.random.randn(self.nb_neurons, 1)
+        #print(self.biais.shape)
+        #print(previous_layer_act.shape)
         Z = self.weights.dot(previous_layer_act) + self.biais
 
         return self.activation.activate(Z)
@@ -30,5 +31,5 @@ class DenseLayer(LayerStruct):
         return self.activation.dz(self.weights, next_layer_dz, previous_layer_act)
     
     def update(self, dw, db, lr):
-        self.weights - lr * dw
-        self.bias - lr * db
+        self.weights = self.weights - lr * dw
+        self.biais = self.biais - lr * db

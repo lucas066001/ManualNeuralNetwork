@@ -12,44 +12,59 @@ class lmnn():
         self.n_iter = n_iter
         self.test_size = test_size
         self.layers = layers
+        self.layers.insert(0, None)
         self.strategy = strategy
         self.sub_parts = sub_parts
         self.nb_layers = len(layers)
         self.training_history = np.zeros((int(self.n_iter), 3))
-        self.X_train, self.X_test, self.y_train, self.y_test = None
+        self.X_train = None
+        self.X_test = None
+        self.y_train = None
+        self.y_test = None
 
-    def forward_propagation(self):
-        activations = {'A0' : self.layers[0].activate(None)}
+    def forward_propagation(self, current_X):
+        #print("----forward_propagation")
+        activations = {'A0' : current_X}
 
-        for c in range(1, self.nb_layers + 1):
+        for c in range(1, self.nb_layers):
+            #print('A' + str(c))    
             if c >= 1 and not np.any(activations['A' + str(c - 1)]):
                 raise ValueError("Nan found, stopping process cause it will likely propagate and ruin your output")
             
             activations['A' + str(c)] = self.layers[c].activate(activations['A' + str(c - 1)])
+        #print(activations['A0'].shape)
+        #print(activations['A1'].shape)
+        #print(activations['A2'].shape)
+        #print("----forward_propagation")
 
         return activations
     
     def back_propagation(self, y, activations):
+        #print("----back_propagation")
 
-        m = self.layers[self.nb_layers - 1].shape[1]
+        m = y.shape[1]
         dZ = activations['A' + str(self.nb_layers - 1)] - y
         gradients = {}
 
         for c in reversed(range(1, self.nb_layers)):
+            #print('A' + str(c))    
+
             gradients['dW' + str(c)] = self.layers[c].dw(m, dZ, activations['A' + str(c - 1)])
             gradients['db' + str(c)] = self.layers[c].db(m, dZ)
-            dZ = self.layers[c].dz(dZ, activations['A' + str(c - 1)])
+            if c > 1:
+                dZ = self.layers[c].dz(dZ, activations['A' + str(c - 1)])
+        #print("----back_propagation")
 
         return gradients
     
     def update(self, gradients):
-        for c in range(1, self.nb_layers + 1):
+        for c in range(1, self.nb_layers):
             self.layers[c].update(gradients['dW' + str(c)], gradients['db' + str(c)], self.lr)
         return
     
     def predict(self, X):
         activations = self.forward_propagation(X)
-        Af = activations['A' + str(self.nb_layers)]
+        Af = activations['A' + str(self.nb_layers - 1)]
         return Af >= 0.5
     
     def save_results(self, i, Af):
@@ -60,15 +75,16 @@ class lmnn():
         self.training_history[i, 1] = (accuracy_score(self.y_train.flatten(), y_pred_train.flatten()))
         self.training_history[i, 2] = (accuracy_score(self.y_test.flatten(), y_pred_test.flatten()))
 
-    def fit(self, X, y):
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y, test_size=self.test_size, random_state=42)
+    def fit(self, X_train, X_test, y_train, y_test):
+        #print("------FIT")
+        self.X_train, self.X_test, self.y_train, self.y_test = X_train, X_test, y_train, y_test
 
         if(self.strategy == "full"):
             for i in tqdm(range(self.n_iter)):
                 activations = self.forward_propagation(self.X_train)
                 gradients = self.back_propagation(self.y_train, activations)
                 self.update(gradients)
-                Af = activations['A' + self.nb_layers]
+                Af = activations['A' + str(self.nb_layers - 1)]
                 self.save_results(i, Af)
 
         elif(self.strategy == "sub"):
@@ -89,8 +105,10 @@ class lmnn():
                     activations = self.forward_propagation(X_train_sub)
                     gradients = self.back_propagation(y_train_sub, activations)
                     self.update(gradients)
-                    Af = activations['A' + str(self.nb_layers)]
+                    Af = activations['A' + str(self.nb_layers - 1)]
                     self.save_results(i, Af)
 
         else:
             raise ValueError("Unsupported strategy")
+        
+        #print("------ENDFIT")
