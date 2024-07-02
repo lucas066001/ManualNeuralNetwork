@@ -3,10 +3,10 @@ from .struct import LayerStruct
 import numpy as np
 from ..activations.struct import ActivationStruct
 
-class DenseLayer(LayerStruct):
-    def __init__(self, activation:ActivationStruct, nb_neurons:int=8):
+class OutputLayer(LayerStruct):
+    def __init__(self, activation:ActivationStruct, nb_classes:int):
         super().__init__()
-        self.nb_neurons = nb_neurons
+        self.nb_neurons = nb_classes
         self.activation = activation
 
     def activate(self, previous_layer_act):

@@ -1,1 +1,96 @@
 #!/usr/bin/env python3
+from sklearn.model_selection import train_test_split
+from .layers.struct import LayerStruct
+from tqdm import tqdm
+import numpy as np
+from sklearn.metrics import accuracy_score, log_loss
+import math
+
+class lmnn():
+    def __init__(self, layers:list[LayerStruct], lr=0.1, n_iter=1000, test_size=0.2, strategy="full", sub_parts=5):
+        self.lr = lr
+        self.n_iter = n_iter
+        self.test_size = test_size
+        self.layers = layers
+        self.strategy = strategy
+        self.sub_parts = sub_parts
+        self.nb_layers = len(layers)
+        self.training_history = np.zeros((int(self.n_iter), 3))
+        self.X_train, self.X_test, self.y_train, self.y_test = None
+
+    def forward_propagation(self):
+        activations = {'A0' : self.layers[0].activate(None)}
+
+        for c in range(1, self.nb_layers + 1):
+            if c >= 1 and not np.any(activations['A' + str(c - 1)]):
+                raise ValueError("Nan found, stopping process cause it will likely propagate and ruin your output")
+            
+            activations['A' + str(c)] = self.layers[c].activate(activations['A' + str(c - 1)])
+
+        return activations
+    
+    def back_propagation(self, y, activations):
+
+        m = self.layers[self.nb_layers - 1].shape[1]
+        dZ = activations['A' + str(self.nb_layers - 1)] - y
+        gradients = {}
+
+        for c in reversed(range(1, self.nb_layers)):
+            gradients['dW' + str(c)] = self.layers[c].dw(m, dZ, activations['A' + str(c - 1)])
+            gradients['db' + str(c)] = self.layers[c].db(m, dZ)
+            dZ = self.layers[c].dz(dZ, activations['A' + str(c - 1)])
+
+        return gradients
+    
+    def update(self, gradients):
+        for c in range(1, self.nb_layers + 1):
+            self.layers[c].update(gradients['dW' + str(c)], gradients['db' + str(c)], self.lr)
+        return
+    
+    def predict(self, X):
+        activations = self.forward_propagation(X)
+        Af = activations['A' + str(self.nb_layers)]
+        return Af >= 0.5
+    
+    def save_results(self, i, Af):
+        # calcul du log_loss et de l'accuracy
+        self.training_history[i, 0] = (log_loss(self.y_train.flatten(), Af.flatten()))
+        y_pred_train = self.predict(self.X_train)
+        y_pred_test = self.predict(self.X_test)
+        self.training_history[i, 1] = (accuracy_score(self.y_train.flatten(), y_pred_train.flatten()))
+        self.training_history[i, 2] = (accuracy_score(self.y_test.flatten(), y_pred_test.flatten()))
+
+    def fit(self, X, y):
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y, test_size=self.test_size, random_state=42)
+
+        if(self.strategy == "full"):
+            for i in tqdm(range(self.n_iter)):
+                activations = self.forward_propagation(self.X_train)
+                gradients = self.back_propagation(self.y_train, activations)
+                self.update(gradients)
+                Af = activations['A' + self.nb_layers]
+                self.save_results(i, Af)
+
+        elif(self.strategy == "sub"):
+            
+            self.n_iter = (np.floor(self.n_iter / self.sub_parts)).astype(int)
+            portion = 1 / self.sub_parts
+            nb_element_sub_train = math.floor(self.X_train.shape[1] * portion)
+            
+            e = 0
+            for i in tqdm(range(self.n_iter -1 )):
+                for x in range(0, self.sub_parts):
+                    e+=1
+                    start_train_index = nb_element_sub_train * x
+                    end_train_index = nb_element_sub_train * (x+1)
+                    X_train_sub = self.X_train[:, start_train_index:end_train_index]
+                    y_train_sub = self.y_train[:, start_train_index:end_train_index]
+
+                    activations = self.forward_propagation(X_train_sub)
+                    gradients = self.back_propagation(y_train_sub, activations)
+                    self.update(gradients)
+                    Af = activations['A' + str(self.nb_layers)]
+                    self.save_results(i, Af)
+
+        else:
+            raise ValueError("Unsupported strategy")

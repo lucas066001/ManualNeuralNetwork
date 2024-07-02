@@ -78,3 +78,19 @@ class LayerStruct(ABC):
     @abstractmethod
     def activate(self, previous_layer_act):
         pass
+
+    @abstractmethod
+    def dw(self, m, next_layer_dz, previous_layer_act):
+        pass
+
+    @abstractmethod
+    def db(self, m, next_layer_dz):
+        pass
+
+    @abstractmethod
+    def dz(self, next_layer_dz, previous_layer_act):
+        pass
+
+    @abstractmethod
+    def update(self, dw, db, lr):
+        pass
