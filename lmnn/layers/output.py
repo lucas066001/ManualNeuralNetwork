@@ -10,17 +10,12 @@ class OutputLayer(LayerStruct):
         self.activation = activation
 
     def activate(self, previous_layer_act):
-        #print("---------LayerAct")
-        #Set base values in case of first iteration
         if self.weights is None:
             self.weights = np.random.randn(self.nb_neurons, len(previous_layer_act))
         if self.biais is None:
             self.biais = np.random.randn(self.nb_neurons, 1)
 
-        #print(previous_layer_act.shape)
-        #print(self.biais)
         Z = self.weights.dot(previous_layer_act) + self.biais
-        #print("---------LayerAct")
         return self.activation.activate(Z)
     
     def dw(self, m, next_layer_dz, previous_layer_act):

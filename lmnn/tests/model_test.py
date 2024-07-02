@@ -48,14 +48,6 @@ ac = accuracy_score(np.argmax(y_test, axis=0),  np.argmax(y_pred, axis=0))
 re = recall_score(np.argmax(y_test, axis=0),  np.argmax(y_pred, axis=0), average='weighted', zero_division=1)
 pr = precision_score(np.argmax(y_test, axis=0),  np.argmax(y_pred, axis=0), average='weighted', zero_division=1)
 
-print(ac)
-print(re)
-print(pr)
-
-
-print("Least accuracy :" + str(ac))
-print("Least recall :" + str(re))
-print("Least precision :" + str(pr))
 bar_width=0.2
 zoomx=(1000, 1800)
 zoomy=(0.60,0.90)

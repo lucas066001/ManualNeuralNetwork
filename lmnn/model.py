@@ -23,37 +23,26 @@ class lmnn():
         self.y_test = None
 
     def forward_propagation(self, current_X):
-        #print("----forward_propagation")
         activations = {'A0' : current_X}
 
         for c in range(1, self.nb_layers):
-            #print('A' + str(c))    
             if c >= 1 and not np.any(activations['A' + str(c - 1)]):
                 raise ValueError("Nan found, stopping process cause it will likely propagate and ruin your output")
             
             activations['A' + str(c)] = self.layers[c].activate(activations['A' + str(c - 1)])
-        #print(activations['A0'].shape)
-        #print(activations['A1'].shape)
-        #print(activations['A2'].shape)
-        #print("----forward_propagation")
 
         return activations
     
     def back_propagation(self, y, activations):
-        #print("----back_propagation")
-
         m = y.shape[1]
         dZ = activations['A' + str(self.nb_layers - 1)] - y
         gradients = {}
 
         for c in reversed(range(1, self.nb_layers)):
-            #print('A' + str(c))    
-
             gradients['dW' + str(c)] = self.layers[c].dw(m, dZ, activations['A' + str(c - 1)])
             gradients['db' + str(c)] = self.layers[c].db(m, dZ)
             if c > 1:
                 dZ = self.layers[c].dz(dZ, activations['A' + str(c - 1)])
-        #print("----back_propagation")
 
         return gradients
     
@@ -76,7 +65,6 @@ class lmnn():
         self.training_history[i, 2] = (accuracy_score(self.y_test.flatten(), y_pred_test.flatten()))
 
     def fit(self, X_train, X_test, y_train, y_test):
-        #print("------FIT")
         self.X_train, self.X_test, self.y_train, self.y_test = X_train, X_test, y_train, y_test
 
         if(self.strategy == "full"):
@@ -110,5 +98,3 @@ class lmnn():
 
         else:
             raise ValueError("Unsupported strategy")
-        
-        #print("------ENDFIT")

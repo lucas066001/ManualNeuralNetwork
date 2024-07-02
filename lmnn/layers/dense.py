@@ -10,13 +10,10 @@ class DenseLayer(LayerStruct):
         self.activation = activation
 
     def activate(self, previous_layer_act):
-        #Set base values in case of first iteration
         if self.weights is None:
             self.weights = np.random.randn(self.nb_neurons, len(previous_layer_act))
         if self.biais is None:
             self.biais = np.random.randn(self.nb_neurons, 1)
-        #print(self.biais.shape)
-        #print(previous_layer_act.shape)
         Z = self.weights.dot(previous_layer_act) + self.biais
 
         return self.activation.activate(Z)
