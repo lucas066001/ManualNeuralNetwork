@@ -1,13 +1,15 @@
 # struct.py
 import abc
 from abc import ABC, abstractmethod
+from ..activations.struct import ActivationStruct
+import numpy as np
 
 class LayerStruct(ABC):
     def __init__(self):
-        self._nb_neurons = None
-        self._activation = None
-        self._weights = None
-        self._biais = None
+        self._nb_neurons:int = None
+        self._activation:ActivationStruct = None
+        self._weights:np.ndarray = None
+        self._biais:np.ndarray = None
 
     @property
     def nb_neurons(self):
@@ -42,7 +44,7 @@ class LayerStruct(ABC):
         del self._activation
 
     @property
-    def weights(self):
+    def weights(self) -> np.ndarray:
         return self._weights
 
     @weights.setter
@@ -58,7 +60,7 @@ class LayerStruct(ABC):
         del self._weights
 
     @property
-    def biais(self):
+    def biais(self) -> np.ndarray:
         return self._biais
 
     @biais.setter

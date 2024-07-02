@@ -1,9 +1,10 @@
 # dense.py
 from .struct import LayerStruct
 import numpy as np
+from ..activations.struct import ActivationStruct
 
 class DenseLayer(LayerStruct):
-    def __init__(self, nb_neurons=8, activation="sig"):
+    def __init__(self, activation:ActivationStruct, nb_neurons:int=8):
         super().__init__()
         self.nb_neurons = nb_neurons
         self.activation = activation
@@ -16,5 +17,5 @@ class DenseLayer(LayerStruct):
             self.biais = np.random.randn(self.nb_neurons)
 
         Z = self.weights.dot(previous_layer_act) + self.biais
-        
-        print("I'm activating !")
+
+        return self.activation.activate(Z)
