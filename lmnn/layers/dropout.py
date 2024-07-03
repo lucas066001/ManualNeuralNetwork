@@ -1,24 +1,29 @@
-# dense.py
+# dropout.py
 from .struct import LayerStruct
 import numpy as np
 from ..activations.struct import ActivationStruct
+import math
+import random
 
-class DenseLayer(LayerStruct):
-    def __init__(self, activation:ActivationStruct, nb_neurons:int=8):
+class DropoutLayer(LayerStruct):
+    def __init__(self, activation:ActivationStruct, nb_neurons:int=8, drop_rate=0.2):
         super().__init__()
         self.nb_neurons = nb_neurons
         self.activation = activation
+        self.drop_rate = drop_rate
+        self.removed_index = None
 
     def activate(self, previous_layer_act):
-        #print("Previous act should have shape like 6, ...")
-        #print(previous_layer_act.shape)
+        if self.removed_index is None: 
+            nb_neurons_kept = math.floor(previous_layer_act.shape[0] * self.drop_rate)
+            self.removed_index = random.sample(range(0, previous_layer_act.shape[0]), nb_neurons_kept)
         if self.weights is None:
             self.weights = np.random.randn(self.nb_neurons, len(previous_layer_act))
         if self.biais is None:
             self.biais = np.random.randn(self.nb_neurons, 1)
+        
+        previous_layer_act[self.removed_index, :] = 0
         Z = self.weights.dot(previous_layer_act) + self.biais
-        #print("self.weights.shape")
-        #print(self.weights.shape)
 
         return self.activation.activate(Z)
     
@@ -32,8 +37,5 @@ class DenseLayer(LayerStruct):
         return self.activation.dz(self.weights, next_layer_dz, previous_layer_act)
     
     def update(self, dw, db, lr):
-        #print("self.weights.shape")
-        #print(self.weights.shape)
-        #print(dw.shape)
         self.weights = self.weights - lr * dw
         self.biais = self.biais - lr * db

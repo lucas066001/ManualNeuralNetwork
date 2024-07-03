@@ -47,6 +47,11 @@ class lmnn():
         return gradients
     
     def update(self, gradients):
+        #print('gradients["dW1"].shape')
+        #print(gradients["dW1"].shape)
+        #print(gradients["dW2"].shape)
+        #print(gradients["dW3"].shape)
+        #print(gradients["dW4"].shape)
         for c in range(1, self.nb_layers):
             self.layers[c].update(gradients['dW' + str(c)], gradients['db' + str(c)], self.lr)
         return

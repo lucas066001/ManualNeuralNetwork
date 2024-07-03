@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from sklearn.metrics import precision_score, recall_score, accuracy_score
 from sklearn.model_selection import train_test_split
+from ..layers.dropout import DropoutLayer
 from ..layers.dense import DenseLayer
 from ..layers.output import OutputLayer
 from ..model import lmnn
@@ -35,12 +36,17 @@ y_test = identity_matrix[y_test[0]].T
 
 layers = [
     DenseLayer(SigmoidActivation(), 15),
+    DropoutLayer(SigmoidActivation(), 6, 1),
     DenseLayer(SigmoidActivation(), 6),
     OutputLayer(SigmoidActivation(), 3)
 ]
 
-model = lmnn(layers, n_iter=1000,)
+model = lmnn(layers, n_iter=5000)
 model.fit(X_train, X_test, y_train, y_test)
+
+
+
+
 
 y_pred = model.predict(X_test)
 
