@@ -7,7 +7,7 @@ from sklearn.metrics import accuracy_score, log_loss
 import math
 
 class lmnn():
-    def __init__(self, layers:list[LayerStruct], lr=0.1, n_iter=1000, test_size=0.2, strategy="full", sub_parts=5):
+    def __init__(self, layers:list[LayerStruct], lr=0.1, n_iter=1000, test_size=0.2, strategy="full", sub_parts=5, patience=50):
         self.lr = lr
         self.n_iter = n_iter
         self.test_size = test_size
@@ -17,6 +17,7 @@ class lmnn():
         self.sub_parts = sub_parts
         self.nb_layers = len(layers)
         self.training_history = np.zeros((int(self.n_iter), 3))
+        self.patience = patience
         self.X_train = None
         self.X_test = None
         self.y_train = None
@@ -79,9 +80,11 @@ class lmnn():
                 self.update(gradients)
                 Af = activations['A' + str(self.nb_layers - 1)]
                 self.save_results(i, Af)
+                if i % self.patience == 0 and ((self.training_history[i, 1] - self.training_history[i - self.patience, 1]) < 0.0001):
+                    break
 
         elif(self.strategy == "sub"):
-            
+            #Not corrected 
             self.n_iter = (np.floor(self.n_iter / self.sub_parts)).astype(int)
             portion = 1 / self.sub_parts
             nb_element_sub_train = math.floor(self.X_train.shape[1] * portion)

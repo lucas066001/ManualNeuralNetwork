@@ -13,12 +13,14 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import accuracy_score, recall_score, precision_score
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.datasets import fetch_openml
 
-# Chargement du jeu de données Iris
-iris = datasets.load_iris()
-X = iris.data
-y = iris.target
-
+X, y = fetch_openml("mnist_784", version=1, return_X_y=True, as_frame=False )
+y = np.array([int(num) for num in y])
+print(X.shape)
+X = X[:6000]
+y = y[:6000]
+print(np.unique(y, return_counts=True))
 scaler = MinMaxScaler()
 X = scaler.fit_transform(X)
 
@@ -28,31 +30,41 @@ y_train = y_train.reshape(1, -1)
 y_test = y_test.reshape(1, -1)
 X_train = X_train.T
 X_test = X_test.T
+print(y_train.shape)
+print(y_test)
 
 # Création de la matrice identité
-identity_matrix = np.eye(3)
+identity_matrix = np.eye(10)
 y_train = identity_matrix[y_train[0]].T
 y_test = identity_matrix[y_test[0]].T
 
 layers = [
-    DenseLayer(SigmoidActivation(), 15),
-    DropoutLayer(SigmoidActivation(), 6, 1),
-    DenseLayer(SigmoidActivation(), 6),
-    OutputLayer(SigmoidActivation(), 3)
+    DenseLayer(SigmoidActivation(), 32),
+    DenseLayer(SigmoidActivation(), 64),
+    DropoutLayer(SigmoidActivation(), 32, 0.2),
+    DenseLayer(SigmoidActivation(), 128),
+    OutputLayer(SigmoidActivation(), 10)
 ]
 
-model = lmnn(layers, n_iter=5000)
+model = lmnn(layers, n_iter=1000, lr=0.9)
+
+print(X_train.shape)
+print(X_test.shape)
+print(y_train.shape)
+print(y_test.shape)
 model.fit(X_train, X_test, y_train, y_test)
 
 
 
 
 
-y_pred = model.predict(X_test)
+y_pred = model.predict(X_train)
 
-ac = accuracy_score(np.argmax(y_test, axis=0),  np.argmax(y_pred, axis=0))
-re = recall_score(np.argmax(y_test, axis=0),  np.argmax(y_pred, axis=0), average='weighted', zero_division=1)
-pr = precision_score(np.argmax(y_test, axis=0),  np.argmax(y_pred, axis=0), average='weighted', zero_division=1)
+print(np.unique(np.argmax(y_pred, axis=0), return_counts=True))
+
+ac = accuracy_score(np.argmax(y_train, axis=0),  np.argmax(y_pred, axis=0))
+re = recall_score(np.argmax(y_train, axis=0),  np.argmax(y_pred, axis=0), average='weighted', zero_division=1)
+pr = precision_score(np.argmax(y_train, axis=0),  np.argmax(y_pred, axis=0), average='weighted', zero_division=1)
 
 bar_width=0.2
 zoomx=(1000, 1800)
@@ -95,6 +107,6 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-disp = ConfusionMatrixDisplay.from_predictions(np.argmax(y_test, axis=0), np.argmax(y_pred, axis=0))
+disp = ConfusionMatrixDisplay.from_predictions(np.argmax(y_train, axis=0), np.argmax(y_pred, axis=0))
 disp.figure_.suptitle("Confusion Matrix")
 plt.show()
