@@ -27,8 +27,9 @@ class lmnn():
         activations = {'A0' : current_X}
 
         for c in range(1, self.nb_layers):
-            if c >= 1 and not np.any(activations['A' + str(c - 1)]):
-                raise ValueError("Nan found, stopping process cause it will likely propagate and ruin your output")
+            # if c >= 1 and not np.any(activations['A' + str(c - 1)]):
+            #     print(np.unique(activations['A' + str(c - 1)], return_counts=True))
+            #     raise ValueError("Nan found, stopping process cause it will likely propagate and ruin your output")
             
             activations['A' + str(c)] = self.layers[c].activate(activations['A' + str(c - 1)])
 

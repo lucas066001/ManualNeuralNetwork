@@ -12,5 +12,5 @@ class ActivationStruct(ABC):
         pass
 
     @abstractmethod
-    def dz(self, weights, next_layer_dz, previous_layer_act):
+    def dz(self, weights, next_layer_dz, previous_layer_act, current_layer_Z):
         pass

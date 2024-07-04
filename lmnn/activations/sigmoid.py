@@ -9,5 +9,5 @@ class SigmoidActivation(ActivationStruct):
     def activate(self, Z):
         return 1 / (1 + np.exp(-Z))
     
-    def dz(self, weights, next_layer_dz, previous_layer_act):
+    def dz(self, weights, next_layer_dz, previous_layer_act, current_layer_Z):
         return np.dot(weights.T, next_layer_dz) * previous_layer_act * (1 - previous_layer_act)
