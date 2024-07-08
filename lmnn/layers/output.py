@@ -12,9 +12,9 @@ class OutputLayer(LayerStruct):
 
     def activate(self, previous_layer_act):
         if self.weights is None:
-            self.weights = np.random.rand(self.nb_neurons, len(previous_layer_act))
+            self.weights = np.random.randn(self.nb_neurons, len(previous_layer_act))
         if self.biais is None:
-            self.biais = np.random.rand(self.nb_neurons, 1)
+            self.biais = np.random.randn(self.nb_neurons, 1)
 
         self.Z = self.weights.dot(previous_layer_act) + self.biais
         return self.activation.activate(self.Z)
@@ -26,7 +26,7 @@ class OutputLayer(LayerStruct):
         return 1/m * np.sum(next_layer_dz, axis=1, keepdims=True)
 
     def dz(self, next_layer_dz, previous_layer_act):
-        return self.activation.dz(self.weights, next_layer_dz, previous_layer_act, self.Z)
+        return np.dot(self.weights.T, next_layer_dz) * self.activation.dz(previous_layer_act)
     
     def update(self, dw, db, lr):
         self.weights = self.weights - lr * dw

@@ -27,10 +27,6 @@ class lmnn():
         activations = {'A0' : current_X}
 
         for c in range(1, self.nb_layers):
-            # if c >= 1 and not np.any(activations['A' + str(c - 1)]):
-            #     print(np.unique(activations['A' + str(c - 1)], return_counts=True))
-            #     raise ValueError("Nan found, stopping process cause it will likely propagate and ruin your output")
-            
             activations['A' + str(c)] = self.layers[c].activate(activations['A' + str(c - 1)])
 
         return activations
@@ -63,12 +59,12 @@ class lmnn():
         Af = activations['A' + str(self.nb_layers - 1)]
         return Af >= 0.5
     
-    def save_results(self, i, Af):
+    def save_results(self, i, Af, X_train, y_train):
         # calcul du log_loss et de l'accuracy
-        self.training_history[i, 0] = (log_loss(self.y_train.flatten(), Af.flatten()))
-        y_pred_train = self.predict(self.X_train)
+        self.training_history[i, 0] = (log_loss(y_train.flatten(), Af.flatten()))
+        y_pred_train = self.predict(X_train)
         y_pred_test = self.predict(self.X_test)
-        self.training_history[i, 1] = (accuracy_score(np.argmax(self.y_train, axis=0), np.argmax(y_pred_train, axis=0)))
+        self.training_history[i, 1] = (accuracy_score(np.argmax(y_train, axis=0), np.argmax(y_pred_train, axis=0)))
         self.training_history[i, 2] = (accuracy_score(np.argmax(self.y_test, axis=0), np.argmax(y_pred_test, axis=0)))
 
     def fit(self, X_train, X_test, y_train, y_test):
@@ -80,7 +76,7 @@ class lmnn():
                 gradients = self.back_propagation(self.y_train, activations)
                 self.update(gradients)
                 Af = activations['A' + str(self.nb_layers - 1)]
-                self.save_results(i, Af)
+                self.save_results(i, Af, self.X_train, self.y_train)
                 if i % self.patience == 0 and ((self.training_history[i, 1] - self.training_history[i - self.patience, 1]) < 0.0001):
                     break
 
@@ -103,7 +99,7 @@ class lmnn():
                     gradients = self.back_propagation(y_train_sub, activations)
                     self.update(gradients)
                     Af = activations['A' + str(self.nb_layers - 1)]
-                    self.save_results(i, Af)
+                    self.save_results(e, Af, X_train_sub, y_train_sub)
 
         else:
             raise ValueError("Unsupported strategy")

@@ -26,7 +26,7 @@ class DenseLayer(LayerStruct):
         return 1/m * np.sum(next_layer_dz, axis=1, keepdims=True)
 
     def dz(self, next_layer_dz, previous_layer_act):
-        return self.activation.dz(self.weights, next_layer_dz, previous_layer_act, self.Z)
+        return np.dot(self.weights.T, next_layer_dz) * self.activation.dz(previous_layer_act)
     
     def update(self, dw, db, lr):
         #print("self.weights.shape")
