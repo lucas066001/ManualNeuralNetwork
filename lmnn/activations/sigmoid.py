@@ -7,6 +7,7 @@ class SigmoidActivation(ActivationStruct):
         super().__init__()
 
     def activate(self, Z):
+        # Z = Z - Z.max()
         return 1 / (1 + np.exp(-Z))
     
     def dz(self, weights, next_layer_dz, previous_layer_act, current_layer_Z):

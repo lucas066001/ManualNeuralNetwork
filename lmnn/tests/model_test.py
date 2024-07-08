@@ -40,14 +40,12 @@ y_train = identity_matrix[y_train[0]].T
 y_test = identity_matrix[y_test[0]].T
 
 layers = [
-    DenseLayer(ReluActivation(), 32),
-    DenseLayer(ReluActivation(), 32),
-    # DropoutLayer(ReluActivation(), 32, 0.2),
-    # DenseLayer(ReluActivation(), 128),
-    OutputLayer(ReluActivation(), 10)
+    DenseLayer(SigmoidActivation(), 128),
+    DropoutLayer(drop_rate=0.2),
+    OutputLayer(SigmoidActivation(), 10)
 ]
 
-model = lmnn(layers, n_iter=1000, lr=0.1, patience=999)
+model = lmnn(layers, n_iter=1000, lr=0.01, patience=150)
 
 #print(X_train.shape)
 #print(X_test.shape)
@@ -61,7 +59,7 @@ model.fit(X_train, X_test, y_train, y_test)
 
 y_pred = model.predict(X_train)
 
-#print(np.unique(np.argmax(y_pred, axis=0), return_counts=True))
+print(np.unique(np.argmax(y_pred, axis=0), return_counts=True))
 
 ac = accuracy_score(np.argmax(y_train, axis=0),  np.argmax(y_pred, axis=0))
 re = recall_score(np.argmax(y_train, axis=0),  np.argmax(y_pred, axis=0), average='weighted', zero_division=1)

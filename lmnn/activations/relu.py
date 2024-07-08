@@ -12,11 +12,8 @@ class ReluActivation(ActivationStruct):
     def dz(self, weights, next_layer_dz, previous_layer_act, current_layer_Z):
         previous_layer_act[previous_layer_act <= 0] = 0
         previous_layer_act[previous_layer_act > 0] = 1
-
-        test = np.dot(weights.T, next_layer_dz)
-        #print(weights.shape)
-        #print(next_layer_dz.shape)
-        #print(next_layer_dz.shape)
-        #print(test.shape)
-        #print(np.unique(np.dot(weights.T, next_layer_dz) * previous_layer_act, return_counts=True))
+        # print(previous_layer_act.shape)
+        # print(previous_layer_act.min())
+        # print(previous_layer_act.max())
+        # print(np.unique(previous_layer_act, return_counts=1))
         return np.dot(weights.T, next_layer_dz) * previous_layer_act

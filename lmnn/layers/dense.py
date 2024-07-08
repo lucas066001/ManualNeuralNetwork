@@ -11,16 +11,12 @@ class DenseLayer(LayerStruct):
         self.Z = None
 
     def activate(self, previous_layer_act):
-        #print("Previous act should have shape like 6, ...")
-        #print(previous_layer_act.shape)
         if self.weights is None:
             self.weights = np.random.randn(self.nb_neurons, len(previous_layer_act))
         if self.biais is None:
             self.biais = np.random.randn(self.nb_neurons, 1)
-        self.Z  = self.weights.dot(previous_layer_act) + self.biais
-        #print("self.weights.shape")
-        #print(self.weights.shape)
 
+        self.Z  = self.weights.dot(previous_layer_act) + self.biais
         return self.activation.activate(self.Z)
     
     def dw(self, m, next_layer_dz, previous_layer_act):

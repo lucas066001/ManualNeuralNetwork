@@ -68,8 +68,8 @@ class lmnn():
         self.training_history[i, 0] = (log_loss(self.y_train.flatten(), Af.flatten()))
         y_pred_train = self.predict(self.X_train)
         y_pred_test = self.predict(self.X_test)
-        self.training_history[i, 1] = (accuracy_score(self.y_train.flatten(), y_pred_train.flatten()))
-        self.training_history[i, 2] = (accuracy_score(self.y_test.flatten(), y_pred_test.flatten()))
+        self.training_history[i, 1] = (accuracy_score(np.argmax(self.y_train, axis=0), np.argmax(y_pred_train, axis=0)))
+        self.training_history[i, 2] = (accuracy_score(np.argmax(self.y_test, axis=0), np.argmax(y_pred_test, axis=0)))
 
     def fit(self, X_train, X_test, y_train, y_test):
         self.X_train, self.X_test, self.y_train, self.y_test = X_train, X_test, y_train, y_test
