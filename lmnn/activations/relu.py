@@ -7,10 +7,9 @@ class ReluActivation(ActivationStruct):
         super().__init__()
 
     def activate(self, Z):
-        Z[Z <= 0 ] = 0
-        return Z
+        return np.maximum(0, Z)
     
     def dz(self, previous_layer_act):
-        previous_layer_act[previous_layer_act <= 0] = 0
-        previous_layer_act[previous_layer_act > 0] = 1
-        return previous_layer_act
+        # previous_layer_act[previous_layer_act <= 0] = 0
+        # previous_layer_act[previous_layer_act > 0] = 1
+        return np.where(previous_layer_act < 0, 0, 1)

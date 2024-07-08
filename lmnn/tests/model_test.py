@@ -7,6 +7,8 @@ from ..layers.output import OutputLayer
 from ..model import lmnn
 from ..activations.sigmoid import SigmoidActivation
 from ..activations.relu import ReluActivation
+from ..initializers.xavier import XavierInitializer
+from ..initializers.he import HeInitializer
 import numpy as np
 from sklearn import datasets
 from sklearn.preprocessing import MinMaxScaler
@@ -40,13 +42,12 @@ y_train = identity_matrix[y_train[0]].T
 y_test = identity_matrix[y_test[0]].T
 
 layers = [
-    # DenseLayer(SigmoidActivation(), 64),
-    # DropoutLayer(drop_rate=0.2),
-    DenseLayer(ReluActivation(), 128),
-    OutputLayer(SigmoidActivation(), 10)
+    DenseLayer(ReluActivation(), HeInitializer(), 32),
+    DenseLayer(SigmoidActivation(), XavierInitializer(), 32),
+    OutputLayer(SigmoidActivation(), XavierInitializer(),  10)
 ]
 
-model = lmnn(layers, n_iter=8000, lr=0.08, patience=150, strategy="sub")
+model = lmnn(layers, n_iter=800, lr=0.08, patience=150, strategy="sub")
 
 #print(X_train.shape)
 #print(X_test.shape)

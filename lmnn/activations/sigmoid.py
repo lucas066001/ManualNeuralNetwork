@@ -9,7 +9,18 @@ class SigmoidActivation(ActivationStruct):
         self.scaler = Normalizer()
 
     def activate(self, Z):
-        Z = self.scaler.fit_transform(Z)
+        # print("Before Z.min()")
+        # print(Z.min())
+        # print(Z.max())
+
+        # Z = ((Z - Z.min()) / (Z.max() - Z.min())) * (10 - -10) + (-10)
+
+        # Z = Z / Z.max()
+        # print("After Z.min()")
+        # print(Z.min())
+        # print(Z.max())
+
+        # raise ValueError("STOP")
         return 1 / (1 + np.exp(-Z))
     
     def dz(self, previous_layer_act):
