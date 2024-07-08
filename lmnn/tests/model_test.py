@@ -42,12 +42,14 @@ y_train = identity_matrix[y_train[0]].T
 y_test = identity_matrix[y_test[0]].T
 
 layers = [
-    DenseLayer(ReluActivation(), HeInitializer(), 32),
-    DenseLayer(SigmoidActivation(), XavierInitializer(), 32),
-    OutputLayer(SigmoidActivation(), XavierInitializer(),  10)
+    # DenseLayer(ReluActivation(), XavierInitializer(), 32),
+    DenseLayer(SigmoidActivation(), XavierInitializer(), 64),
+    DropoutLayer(drop_rate=0.35),
+    DenseLayer(SigmoidActivation(), HeInitializer(), 64),
+    OutputLayer(SigmoidActivation(), XavierInitializer(startegy="normal"),  10)
 ]
 
-model = lmnn(layers, n_iter=800, lr=0.08, patience=150, strategy="sub")
+model = lmnn(layers, n_iter=8000, lr=0.08, patience=8000, strategy="sub")
 
 #print(X_train.shape)
 #print(X_test.shape)

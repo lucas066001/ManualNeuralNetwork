@@ -87,6 +87,7 @@ class lmnn():
             nb_element_sub_train = math.floor(self.X_train.shape[1] * portion)
             
             e = 0
+            early_stop = False
             for i in tqdm(range(self.n_iter -1 )):
                 for x in range(0, self.sub_parts):
                     e+=1
@@ -100,6 +101,10 @@ class lmnn():
                     self.update(gradients)
                     Af = activations['A' + str(self.nb_layers - 1)]
                     self.save_results(e, Af, X_train_sub, y_train_sub)
-
+                    if e % self.patience == 0 and ((self.training_history[e, 1] - self.training_history[e - self.patience, 1]) < 0.0001):
+                        early_stop = True
+                        break
+                if early_stop == True:
+                    break
         else:
             raise ValueError("Unsupported strategy")
