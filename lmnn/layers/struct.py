@@ -2,12 +2,14 @@
 import abc
 from abc import ABC, abstractmethod
 from ..activations.struct import ActivationStruct
+from ..initializers.struct import InitializerStruct
 import numpy as np
 
 class LayerStruct(ABC):
     def __init__(self):
         self._nb_neurons:int = None
         self._activation:ActivationStruct = None
+        self._initializer:InitializerStruct = None
         self._weights:np.ndarray = None
         self._biais:np.ndarray = None
 
@@ -42,6 +44,22 @@ class LayerStruct(ABC):
     @activation.deleter
     def activation(self):
         del self._activation
+
+    @property
+    def initializer(self):
+        return self._initializer
+
+    @initializer.setter
+    def initializer(self, initializer):
+        self._initializer = initializer
+
+    @initializer.getter
+    def initializer(self):
+        return self._initializer
+
+    @initializer.deleter
+    def initializer(self):
+        del self._initializer
 
     @property
     def weights(self) -> np.ndarray:
@@ -89,6 +107,10 @@ class LayerStruct(ABC):
 
     @abstractmethod
     def dz(self, next_layer_dz, previous_layer_act):
+        pass
+
+    @abstractmethod
+    def da(self, previous_layer_act):
         pass
 
     @abstractmethod

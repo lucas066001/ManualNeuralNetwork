@@ -1,13 +1,17 @@
 # dense.py
 from .struct import ActivationStruct
 import numpy as np
+from sklearn.preprocessing import Normalizer
 
 class SigmoidActivation(ActivationStruct):
     def __init__(self):
         super().__init__()
+        # self.scaler = Normalizer()
 
     def activate(self, Z):
-        return 1 / (1 + np.exp(-Z))
+        # Z = self.scaler.fit_transform(Z)
+        sig = 1 / (1 + np.exp(-Z))
+        return sig
     
-    def dz(self, weights, next_layer_dz, previous_layer_act):
-        return np.dot(weights.T, next_layer_dz) * previous_layer_act * (1 - previous_layer_act)
+    def da(self, previous_layer_act):
+        return previous_layer_act * (1 - previous_layer_act)
