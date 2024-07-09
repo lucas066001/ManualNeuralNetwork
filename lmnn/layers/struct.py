@@ -110,5 +110,9 @@ class LayerStruct(ABC):
         pass
 
     @abstractmethod
+    def da(self, previous_layer_act):
+        pass
+
+    @abstractmethod
     def update(self, dw, db, lr):
         pass

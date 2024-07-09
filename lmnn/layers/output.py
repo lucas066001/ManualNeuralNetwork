@@ -28,8 +28,11 @@ class OutputLayer(LayerStruct):
         return 1/m * np.sum(next_layer_dz, axis=1, keepdims=True)
 
     def dz(self, next_layer_dz, previous_layer_act):
-        return np.dot(self.weights.T, next_layer_dz) * self.activation.dz(previous_layer_act)
+        return np.dot(self.weights.T, next_layer_dz)
     
+    def da(self, previous_layer_act):
+        return self.activation.da(previous_layer_act)
+
     def update(self, dw, db, lr):
         self.weights = self.weights - lr * dw
         self.biais= self.biais - lr * db

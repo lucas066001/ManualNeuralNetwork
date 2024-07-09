@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from sklearn.metrics import precision_score, recall_score, accuracy_score
 from sklearn.model_selection import train_test_split
+
+from lmnn.activations.softmax import SoftMaxActivation
 from ..layers.dropout import DropoutLayer
 from ..layers.dense import DenseLayer
 from ..layers.output import OutputLayer
@@ -8,6 +10,7 @@ from ..model import lmnn
 from ..activations.sigmoid import SigmoidActivation
 from ..activations.relu import ReluActivation
 from ..initializers.xavier import XavierInitializer
+from ..loss.bce import BceLoss
 from ..initializers.he import HeInitializer
 import numpy as np
 from sklearn import datasets
@@ -42,14 +45,13 @@ y_train = identity_matrix[y_train[0]].T
 y_test = identity_matrix[y_test[0]].T
 
 layers = [
-    # DenseLayer(ReluActivation(), XavierInitializer(), 32),
+    DenseLayer(ReluActivation(), XavierInitializer(startegy="normal"), 64),
+    DropoutLayer(drop_rate=0.2),
     DenseLayer(SigmoidActivation(), XavierInitializer(), 64),
-    DropoutLayer(drop_rate=0.35),
-    DenseLayer(SigmoidActivation(), HeInitializer(), 64),
     OutputLayer(SigmoidActivation(), XavierInitializer(startegy="normal"),  10)
 ]
 
-model = lmnn(layers, n_iter=8000, lr=0.08, patience=8000, strategy="sub")
+model = lmnn(layers, BceLoss(), n_iter=2800, lr=0.08, patience=2800, strategy="sub", sub_parts=3)
 
 #print(X_train.shape)
 #print(X_test.shape)

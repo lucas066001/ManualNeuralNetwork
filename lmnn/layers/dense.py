@@ -17,7 +17,10 @@ class DenseLayer(LayerStruct):
             self.weights = self.initializer.generate_weights(len(previous_layer_act), self.nb_neurons)
         if self.biais is None:
             self.biais = np.random.rand(self.nb_neurons, 1)
-
+        # print("Weights ------------------")
+        # print(self.weights.min())
+        # print(self.weights.max())
+        # print("------------------")
         self.Z  = np.dot(self.weights, previous_layer_act) + self.biais
         return self.activation.activate(self.Z)
     
@@ -28,11 +31,11 @@ class DenseLayer(LayerStruct):
         return 1/m * np.sum(next_layer_dz, axis=1, keepdims=True)
 
     def dz(self, next_layer_dz, previous_layer_act):
-        return np.dot(self.weights.T, next_layer_dz) * self.activation.dz(previous_layer_act)
+        return np.dot(self.weights.T, next_layer_dz)
     
+    def da(self, previous_layer_act):
+        return self.activation.da(previous_layer_act)
+
     def update(self, dw, db, lr):
-        #print("self.weights.shape")
-        #print(self.weights.shape)
-        #print(dw.shape)
         self.weights = self.weights - lr * dw
         self.biais = self.biais - lr * db

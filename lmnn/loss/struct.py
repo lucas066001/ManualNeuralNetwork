@@ -2,15 +2,15 @@
 import abc
 from abc import ABC, abstractmethod
 
-class ActivationStruct(ABC):
+class LossStruct(ABC):
 
     def __init__(self):
         self._dz = None
 
     @abstractmethod
-    def activate(self, previous_layer_act):
+    def compute_loss(self, A, y_true):
         pass
 
     @abstractmethod
-    def da(self, previous_layer_act):
+    def dl(self, A, y_true):
         pass
