@@ -9,8 +9,9 @@ from ..layers.output import OutputLayer
 from ..model import lmnn
 from ..activations.sigmoid import SigmoidActivation
 from ..activations.relu import ReluActivation
-from ..initializers.xavier import XavierInitializer
 from ..loss.bce import BceLoss
+from ..initializers.xavier import XavierInitializer
+from ..initializers.random import RandomInitializer
 from ..initializers.he import HeInitializer
 import numpy as np
 from sklearn import datasets
@@ -46,12 +47,12 @@ y_test = identity_matrix[y_test[0]].T
 
 layers = [
     DenseLayer(ReluActivation(), XavierInitializer(startegy="normal"), 64),
-    DropoutLayer(drop_rate=0.2),
-    DenseLayer(SigmoidActivation(), XavierInitializer(), 64),
-    OutputLayer(SigmoidActivation(), XavierInitializer(startegy="normal"),  10)
+    DenseLayer(SigmoidActivation(), HeInitializer(), 64),
+    DenseLayer(ReluActivation(), XavierInitializer(startegy="normal"), 64),
+    OutputLayer(SoftMaxActivation(), XavierInitializer(startegy="normal"),  10)
 ]
 
-model = lmnn(layers, BceLoss(), n_iter=2800, lr=0.08, patience=2800, strategy="sub", sub_parts=3)
+model = lmnn(layers, BceLoss(), n_iter=2800, lr=0.01, patience=350, strategy="sub", sub_parts=2)
 
 #print(X_train.shape)
 #print(X_test.shape)
