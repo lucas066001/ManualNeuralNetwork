@@ -3,17 +3,19 @@ from sklearn.metrics import precision_score, recall_score, accuracy_score
 from sklearn.model_selection import train_test_split
 
 from lmnn.activations.softmax import SoftMaxActivation
-from ..layers.dropout import DropoutLayer
+from ..layers.dropout_gpu import DropoutGpuLayer
 from ..layers.dense_gpu import DenseGpuLayer
 from ..layers.output_gpu import  OutputGpuLayer
 from ..model_gpu import lmnn
 from ..activations.sigmoid_gpu import SigmoidGpuActivation
 from ..activations.relu_gpu import ReluGpuActivation
-from ..loss.bce import BceLoss
+from ..loss.bce_gpu import BceGpuLoss
 from ..initializers.random_gpu import RandomGpuInitializer
+from ..initializers.xavier_gpu import XavierGpuInitializer
 from ..initializers.random import RandomInitializer
 from ..initializers.he import HeInitializer
 import numpy as np
+import cupy as cp
 from sklearn import datasets
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import ConfusionMatrixDisplay
@@ -46,13 +48,15 @@ y_train = identity_matrix[y_train[0]].T
 y_test = identity_matrix[y_test[0]].T
 
 layers = [
-    DenseGpuLayer(SigmoidGpuActivation(), RandomGpuInitializer(), 64),
-    DenseGpuLayer(ReluGpuActivation(), RandomGpuInitializer(strategy="small"), 64),
-    DenseGpuLayer(SigmoidGpuActivation(), RandomGpuInitializer(), 64),
+    DenseGpuLayer(SigmoidGpuActivation(), RandomGpuInitializer(), 256),
+    DropoutGpuLayer(drop_rate=0.1),
+    DenseGpuLayer(ReluGpuActivation(), XavierGpuInitializer(), 128),
+    DenseGpuLayer(SigmoidGpuActivation(), RandomGpuInitializer(), 128),
+    DenseGpuLayer(ReluGpuActivation(), XavierGpuInitializer(), 64),
     OutputGpuLayer(SigmoidGpuActivation(), RandomGpuInitializer(),  10)
 ]
 
-model = lmnn(layers, BceLoss(), n_iter=2800, lr=0.01, patience=350, strategy="sub", sub_parts=2)
+model = lmnn(layers, BceGpuLoss(), n_iter=2800, lr=0.01, patience=350, strategy="sub", sub_parts=2)
 
 #print(X_train.shape)
 #print(X_test.shape)
@@ -66,8 +70,9 @@ model.fit(X_train, X_test, y_train, y_test)
 
 y_pred = model.predict(X_train)
 
-print(np.unique(np.argmax(y_train, axis=0), return_counts=True))
-print(np.unique(np.argmax(y_pred, axis=0), return_counts=True))
+# print(np.unique(np.argmax(y_train, axis=0), return_counts=True))
+print("vvvvv Argmax y_pred vvvvvvvv")
+print(np.unique(np.argmax(y_pred.get(), axis=0), return_counts=True))
 
 print(type(y_pred))
 print(type(y_pred.get()))
