@@ -4,13 +4,13 @@ from sklearn.model_selection import train_test_split
 
 from lmnn.activations.softmax import SoftMaxActivation
 from ..layers.dropout import DropoutLayer
-from ..layers.dense import DenseLayer
-from ..layers.output import OutputLayer
-from ..model import lmnn
-from ..activations.sigmoid import SigmoidActivation
-from ..activations.relu import ReluActivation
+from ..layers.dense_gpu import DenseGpuLayer
+from ..layers.output_gpu import  OutputGpuLayer
+from ..model_gpu import lmnn
+from ..activations.sigmoid_gpu import SigmoidGpuActivation
+from ..activations.relu_gpu import ReluGpuActivation
 from ..loss.bce import BceLoss
-from ..initializers.xavier import XavierInitializer
+from ..initializers.random_gpu import RandomGpuInitializer
 from ..initializers.random import RandomInitializer
 from ..initializers.he import HeInitializer
 import numpy as np
@@ -46,10 +46,10 @@ y_train = identity_matrix[y_train[0]].T
 y_test = identity_matrix[y_test[0]].T
 
 layers = [
-    DenseLayer(SigmoidActivation(), RandomInitializer(), 64),
-    # DenseLayer(ReluActivation(), RandomInitializer(startegy="small"), 64),
-    DenseLayer(SigmoidActivation(), RandomInitializer(), 64),
-    OutputLayer(SoftMaxActivation(), RandomInitializer(),  10)
+    DenseGpuLayer(SigmoidGpuActivation(), RandomGpuInitializer(), 64),
+    DenseGpuLayer(ReluGpuActivation(), RandomGpuInitializer(strategy="small"), 64),
+    DenseGpuLayer(SigmoidGpuActivation(), RandomGpuInitializer(), 64),
+    OutputGpuLayer(SigmoidGpuActivation(), RandomGpuInitializer(),  10)
 ]
 
 model = lmnn(layers, BceLoss(), n_iter=2800, lr=0.01, patience=350, strategy="sub", sub_parts=2)
@@ -69,9 +69,12 @@ y_pred = model.predict(X_train)
 print(np.unique(np.argmax(y_train, axis=0), return_counts=True))
 print(np.unique(np.argmax(y_pred, axis=0), return_counts=True))
 
-ac = accuracy_score(np.argmax(y_train, axis=0),  np.argmax(y_pred, axis=0))
-re = recall_score(np.argmax(y_train, axis=0),  np.argmax(y_pred, axis=0), average='weighted', zero_division=1)
-pr = precision_score(np.argmax(y_train, axis=0),  np.argmax(y_pred, axis=0), average='weighted', zero_division=1)
+print(type(y_pred))
+print(type(y_pred.get()))
+
+ac = accuracy_score(np.argmax(y_train, axis=0),  np.argmax(y_pred.get(), axis=0))
+re = recall_score(np.argmax(y_train, axis=0),  np.argmax(y_pred.get(), axis=0), average='weighted', zero_division=1)
+pr = precision_score(np.argmax(y_train, axis=0),  np.argmax(y_pred.get(), axis=0), average='weighted', zero_division=1)
 
 bar_width=0.2
 zoomx=(1000, 1800)
@@ -85,15 +88,15 @@ plt.bar(3, pr, width=bar_width, label='Precision Score', color='#84A21F')
 
 plt.figure(figsize=(12, 5))
 plt.subplot(1, 2, 1)
-plt.plot(model.training_history[:, 0])
+plt.plot(model.training_history.get()[:, 0])
 plt.title('Loss Curve')
 plt.xlabel('Iterations')
 plt.ylabel('L')
 plt.grid(True)
 
 plt.subplot(1, 2, 2)
-plt.plot(range(model.training_history[:, 1].shape[0]), model.training_history[:, 1], color=('green', 0.5), label='Training accuracy')
-plt.plot(range(model.training_history[:, 2].shape[0]), model.training_history[:, 2], color=('orange', 0.5),  label='Test accuracy')
+plt.plot(range(model.training_history.get()[:, 1].shape[0]), model.training_history.get()[:, 1], color=('green', 0.5), label='Training accuracy')
+plt.plot(range(model.training_history.get()[:, 2].shape[0]), model.training_history.get()[:, 2], color=('orange', 0.5),  label='Test accuracy')
 plt.title('Learning Curve')
 plt.xlabel('Iterations')
 plt.ylabel('Accuracy')
@@ -103,8 +106,8 @@ plt.show()
 
 
 ax = plt.subplot(1, 1, 1)
-plt.plot(range(model.training_history[:, 1].shape[0]), model.training_history[:, 1], color=('green', 0.5), label='Training accuracy')
-plt.plot(range(model.training_history[:, 2].shape[0]), model.training_history[:, 2], color=('orange', 0.5), label='Test accuracy')
+plt.plot(range(model.training_history.get()[:, 1].shape[0]), model.training_history.get()[:, 1], color=('green', 0.5), label='Training accuracy')
+plt.plot(range(model.training_history.get()[:, 2].shape[0]), model.training_history.get()[:, 2], color=('orange', 0.5), label='Test accuracy')
 ax.set_ylim(zoomy)
 ax.set_xlim(zoomx)
 plt.title('Learning Curve (zoomed)')
@@ -114,6 +117,6 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-disp = ConfusionMatrixDisplay.from_predictions(np.argmax(y_train, axis=0), np.argmax(y_pred, axis=0))
+disp = ConfusionMatrixDisplay.from_predictions(np.argmax(y_train, axis=0), np.argmax(y_pred.get(), axis=0))
 disp.figure_.suptitle("Confusion Matrix")
 plt.show()

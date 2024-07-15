@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+from sklearn.model_selection import train_test_split
+from .layers.struct import LayerStruct
+from .loss.struct import LossStruct
+from tqdm import tqdm
+import cupy as cp
+from sklearn.metrics import accuracy_score, log_loss
+import math
+
+class lmnn():
+    def __init__(self, layers:list[LayerStruct], loss:LossStruct, lr=0.1, n_iter=1000, test_size=0.2, strategy="full", sub_parts=5, patience=50):
+        self.lr = lr
+        self.n_iter = n_iter
+        self.test_size = test_size
+        self.layers = layers
+        self.layers.insert(0, None)
+        self.strategy = strategy
+        self.sub_parts = sub_parts
+        self.nb_layers = len(layers)
+        self.training_history = cp.zeros((int(self.n_iter), 3))
+        self.patience = patience
+        self.loss = loss
+        self.X_train = None
+        self.X_test = None
+        self.y_train = None
+        self.y_test = None
+
+    def forward_propagation(self, current_X):
+        activations = {'A0' : current_X}
+
+        for c in range(1, self.nb_layers):
+            activations['A' + str(c)] = self.layers[c].activate(activations['A' + str(c - 1)])
+
+        return activations
+    
+    def back_propagation(self, y, activations):
+        m = y.shape[1]
+        dL = self.loss.dl(activations['A' + str(self.nb_layers - 1)], y)
+        gradients = {}
+
+        for c in reversed(range(1, self.nb_layers)):
+            dZ = dL * self.layers[c].da(activations['A' + str(c)])
+            gradients['dW' + str(c)] = self.layers[c].dw(m, dZ, activations['A' + str(c - 1)])
+            gradients['db' + str(c)] = self.layers[c].db(m, dZ)
+            if c > 1:
+                dL = self.layers[c].dz(dZ, activations['A' + str(c - 1)])
+
+        return gradients
+    
+    def update(self, gradients):
+        for c in range(1, self.nb_layers):
+            self.layers[c].update(gradients['dW' + str(c)], gradients['db' + str(c)], self.lr)
+        return
+    
+    def predict(self, X):
+        X = cp.asarray(X)
+        activations = self.forward_propagation(X)
+        Af = activations['A' + str(self.nb_layers - 1)]
+        return Af >= 0.5
+    
+    def save_results(self, i, Af, X_train, y_train):
+        # calcul du log_loss et de l'accuracy
+        test = self.loss.compute_loss(Af, y_train)
+        self.training_history[i, 0] = cp.mean(test)
+        y_pred_train = self.predict(X_train)
+        y_pred_test = self.predict(self.X_test)
+        self.training_history[i, 1] = (accuracy_score(cp.argmax(y_train, axis=0).get(), cp.argmax(y_pred_train, axis=0).get()))
+        self.training_history[i, 2] = (accuracy_score(cp.argmax(self.y_test, axis=0).get(), cp.argmax(y_pred_test, axis=0).get()))
+
+    def fit(self, X_train, X_test, y_train, y_test):
+        # self.X_train, self.X_test, self.y_train, self.y_test = X_train, X_test, y_train, y_test
+
+        self.X_train = cp.asarray(X_train)
+        self.X_test = cp.asarray(X_test)
+        self.y_train = cp.asarray(y_train)
+        self.y_test = cp.asarray(y_test)
+
+
+        if(self.strategy == "full"):
+            for i in tqdm(range(self.n_iter)):
+                activations = self.forward_propagation(self.X_train)
+                gradients = self.back_propagation(self.y_train, activations)
+                self.update(gradients)
+                Af = activations['A' + str(self.nb_layers - 1)]
+                self.save_results(i, Af, self.X_train, self.y_train)
+                if i % self.patience == 0 and ((self.training_history[i, 1] - self.training_history[i - self.patience, 1]) < 0.0001):
+                    break
+
+        elif(self.strategy == "sub"):
+            self.n_iter = (cp.floor(self.n_iter / self.sub_parts)).astype(int)
+            portion = 1 / self.sub_parts
+            nb_element_sub_train = math.floor(self.X_train.shape[1] * portion)
+            
+            e = 0
+            early_stop = False
+            # print("range(self.n_iter)")
+            # print(type(self.n_iter))
+            # print(range(self.n_iter))
+            for i in tqdm(range(int(self.n_iter - 1) )):
+                for x in range(0, int(self.sub_parts)):
+                    e+=1
+                    start_train_index = nb_element_sub_train * x
+                    end_train_index = nb_element_sub_train * (x+1)
+                    X_train_sub = self.X_train[:, start_train_index:end_train_index]
+                    y_train_sub = self.y_train[:, start_train_index:end_train_index]
+
+                    activations = self.forward_propagation(X_train_sub)
+                    gradients = self.back_propagation(y_train_sub, activations)
+                    self.update(gradients)
+                    Af = activations['A' + str(self.nb_layers - 1)]
+                    self.save_results(e, Af, X_train_sub, y_train_sub)
+                    if e % self.patience == 0 and ((self.training_history[e, 1] - self.training_history[e - self.patience, 1]) < 0.0001):
+                        early_stop = True
+                        break
+                if early_stop == True:
+                    break
+        else:
+            raise ValueError("Unsupported strategy")
