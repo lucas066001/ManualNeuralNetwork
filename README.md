@@ -1,4 +1,4 @@
-# LMNN: Learning Machine Neural Networks
+# LMNN: Learning Manual Neural Networks
 
 *Originally, the 'L' in LMNN stood for the first letter of my name, but after some thought, that seemed a bit too much 😉*
 
@@ -26,7 +26,7 @@ Ensure you have Python 3.12 and the required libraries installed. You can set up
 
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/yourusername/lmnn.git
+    git clone https://github.com/lucas066001/ManualNeuralNetwork.git
     cd lmnn
     ```
 
