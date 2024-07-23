@@ -1,9 +1,10 @@
 # struct.py
 import abc
 from abc import ABC, abstractmethod
-from ..activations.struct import ActivationStruct
-from ..initializers.struct import InitializerStruct
 import numpy as np
+
+from lmnn.activations.struct import ActivationStruct
+from lmnn.initializers.struct import InitializerStruct
 
 class LayerStruct(ABC):
     def __init__(self):

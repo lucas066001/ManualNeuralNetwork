@@ -1,15 +1,13 @@
 # dense.py
-from .struct import ActivationStruct
 import numpy as np
-from sklearn.preprocessing import Normalizer
+
+from lmnn.activations.struct import ActivationStruct
 
 class SigmoidActivation(ActivationStruct):
     def __init__(self):
         super().__init__()
-        # self.scaler = Normalizer()
 
     def activate(self, Z):
-        # Z = self.scaler.fit_transform(Z)
         sig = 1 / (1 + np.exp(-Z))
         return sig
     

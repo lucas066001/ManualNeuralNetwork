@@ -1,6 +1,7 @@
 # he.py
-from .struct import InitializerStruct
 import cupy as cp
+
+from lmnn.initializers.struct import InitializerStruct
 
 class HeInitializer(InitializerStruct):
     def __init__(self, startegy="uniform"):

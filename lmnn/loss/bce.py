@@ -1,6 +1,7 @@
 # he.py
-from .struct import LossStruct
 import numpy as np
+
+from lmnn.loss.struct import LossStruct
 
 class BceLoss(LossStruct):
     def __init__(self):

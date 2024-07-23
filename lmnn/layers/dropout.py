@@ -1,9 +1,9 @@
 # dropout.py
-from .struct import LayerStruct
 import numpy as np
-from ..activations.struct import ActivationStruct
 import math
 import random
+
+from lmnn.layers.struct import LayerStruct
 
 class DropoutLayer(LayerStruct):
     def __init__(self, drop_rate=0.2):

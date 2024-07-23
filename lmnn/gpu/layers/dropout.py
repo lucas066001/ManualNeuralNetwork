@@ -1,11 +1,11 @@
 # dropout.py
-from .struct import LayerStruct
 import cupy as cp
-from ..activations.struct import ActivationStruct
 import math
 import random
 
-class DropoutGpuLayer(LayerStruct):
+from lmnn.layers.struct import LayerStruct
+
+class DropoutLayer(LayerStruct):
     def __init__(self, drop_rate=0.2):
         super().__init__()
         self.drop_rate = drop_rate

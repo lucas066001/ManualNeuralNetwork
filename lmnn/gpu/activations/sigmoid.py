@@ -1,7 +1,8 @@
 import cupy as cp
-from .struct import ActivationStruct
 
-class SigmoidGpuActivation(ActivationStruct):
+from lmnn.activations.struct import ActivationStruct
+
+class SigmoidActivation(ActivationStruct):
     def __init__(self):
         super().__init__()
 

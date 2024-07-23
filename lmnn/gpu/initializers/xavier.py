@@ -1,8 +1,9 @@
 # xavier.py
-from .struct import InitializerStruct
 import cupy as cp
 
-class XavierGpuInitializer(InitializerStruct):
+from lmnn.initializers.struct import InitializerStruct
+
+class XavierInitializer(InitializerStruct):
     def __init__(self, startegy="uniform"):
         self.strategy = startegy
 

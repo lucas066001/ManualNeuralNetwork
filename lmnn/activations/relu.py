@@ -1,6 +1,7 @@
 # dense.py
-from .struct import ActivationStruct
 import numpy as np
+
+from lmnn.activations.struct import ActivationStruct
 
 class ReluActivation(ActivationStruct):
     def __init__(self):

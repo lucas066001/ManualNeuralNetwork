@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Import should be able to retreive all activations more conviniently
-from lmnn.layers.structures import DenseLayer, DropoutLayer, OutputLayer, LayerStruct
-from lmnn.activations.functions import SigmoidActivation
+from lmnn.gpu.layers.structures import DenseLayer, DropoutLayer, OutputLayer, LayerStruct
+from lmnn.gpu.activations.functions import SigmoidActivation
 
 
 dl =  DenseLayer(SigmoidActivation(), 15)

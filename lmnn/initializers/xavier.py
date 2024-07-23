@@ -1,6 +1,7 @@
 # xavier.py
-from .struct import InitializerStruct
 import numpy as np
+
+from lmnn.initializers.struct import InitializerStruct
 
 class XavierInitializer(InitializerStruct):
     def __init__(self, startegy="uniform"):

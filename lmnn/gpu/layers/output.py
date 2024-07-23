@@ -1,9 +1,10 @@
 import cupy as cp
-from .struct import LayerStruct
-from ..activations.struct import ActivationStruct
-from ..initializers.struct import InitializerStruct
 
-class OutputGpuLayer(LayerStruct):
+from lmnn.layers.struct import LayerStruct
+from lmnn.activations.struct import ActivationStruct
+from lmnn.initializers.struct import InitializerStruct
+
+class OutputLayer(LayerStruct):
     def __init__(self, activation: ActivationStruct, initializer: InitializerStruct, nb_classes: int):
         super().__init__()
         self.nb_neurons = nb_classes

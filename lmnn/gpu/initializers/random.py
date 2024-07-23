@@ -1,7 +1,8 @@
 import cupy as cp
-from .struct import InitializerStruct
 
-class RandomGpuInitializer(InitializerStruct):
+from lmnn.initializers.struct import InitializerStruct
+
+class RandomInitializer(InitializerStruct):
     def __init__(self, strategy="classic"):
         self.strategy = strategy
 

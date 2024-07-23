@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-from sklearn.model_selection import train_test_split
-from .layers.struct import LayerStruct
-from .loss.struct import LossStruct
 from tqdm import tqdm
 import cupy as cp
-from sklearn.metrics import accuracy_score, log_loss
 import math
+
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, log_loss
+
+from lmnn.gpu.layers.structures import LayerStruct
+from lmnn.gpu.loss.functions import LossStruct
 
 class lmnn():
     def __init__(self, layers:list[LayerStruct], loss:LossStruct, lr=0.1, n_iter=1000, test_size=0.2, strategy="full", sub_parts=5, patience=50):

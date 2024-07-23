@@ -1,8 +1,9 @@
 # he.py
-from .struct import LossStruct
 import cupy as cp
 
-class BceGpuLoss(LossStruct):
+from lmnn.loss.struct import LossStruct
+
+class BceLoss(LossStruct):
     def __init__(self):
         self.epsilon = 1.0e-9
         self.threshold = 1.0e-5

@@ -9,11 +9,11 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import accuracy_score, recall_score, precision_score
 
-from lmnn.model import lmnn
-from lmnn.layers.structures import DropoutLayer, DenseLayer, OutputLayer
-from lmnn.activations.functions import SoftMaxActivation, SigmoidActivation, ReluActivation
-from lmnn.loss.bce import BceLoss
-from lmnn.initializers.functions import XavierInitializer, RandomInitializer, HeInitializer
+from lmnn.gpu.model import lmnn
+from lmnn.gpu.layers.structures import DropoutLayer, DenseLayer, OutputLayer
+from lmnn.gpu.activations.functions import SoftMaxActivation, SigmoidActivation, ReluActivation
+from lmnn.gpu.loss.bce import BceLoss
+from lmnn.gpu.initializers.functions import XavierInitializer, RandomInitializer, HeInitializer
 
 X, y = fetch_openml("mnist_784", version=1, return_X_y=True, as_frame=False )
 y = np.array([int(num) for num in y])

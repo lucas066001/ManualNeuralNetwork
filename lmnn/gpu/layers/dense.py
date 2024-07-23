@@ -1,9 +1,11 @@
 # dense.py
 import cupy as cp
-from .struct import LayerStruct
-from ..activations.struct import ActivationStruct
-from ..initializers.struct import InitializerStruct
-class DenseGpuLayer(LayerStruct):
+
+from lmnn.layers.struct import LayerStruct
+from lmnn.activations.struct import ActivationStruct
+from lmnn.initializers.struct import InitializerStruct
+
+class DenseLayer(LayerStruct):
     def __init__(self, activation: ActivationStruct, initializer: InitializerStruct, nb_neurons: int = 8):
         super().__init__()
         self.nb_neurons = nb_neurons
