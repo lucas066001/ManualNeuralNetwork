@@ -39,10 +39,9 @@ y_train = identity_matrix[y_train[0]].T
 y_test = identity_matrix[y_test[0]].T
 
 layers = [
-    DenseLayer(SigmoidActivation(), RandomInitializer(), 64),
-    DenseLayer(ReluActivation(), XavierInitializer(strategy="normal"), 64),
-    DenseLayer(SigmoidActivation(), HeInitializer(), 64),
-    DenseLayer(ReluActivation(), XavierInitializer(strategy="uniform"), 64),
+    DenseLayer(SigmoidActivation(), RandomInitializer(), 256),
+    DropoutLayer(),
+    DenseLayer(ReluActivation(), HeInitializer(), 64),
     OutputLayer(SigmoidActivation(), RandomInitializer(),  10)
 ]
 

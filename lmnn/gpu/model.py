@@ -6,6 +6,7 @@ import math
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, log_loss
 
+from lmnn.gpu.layers.dropout import DropoutLayer
 from lmnn.gpu.layers.structures import LayerStruct
 from lmnn.gpu.loss.functions import LossStruct
 
@@ -27,11 +28,15 @@ class lmnn():
         self.y_train = None
         self.y_test = None
 
-    def forward_propagation(self, current_X):
+    def forward_propagation(self, current_X, predicting=False):
         activations = {'A0' : current_X}
+        previous_layer_index = 0
 
         for c in range(1, self.nb_layers):
-            activations['A' + str(c)] = self.layers[c].activate(activations['A' + str(c - 1)])
+            if predicting == True and isinstance(self.layers[c], DropoutLayer):
+                continue
+            activations['A' + str(c)] = self.layers[c].activate(activations['A' + str(previous_layer_index)])
+            previous_layer_index = c
 
         return activations
     
