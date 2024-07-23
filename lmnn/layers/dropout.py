@@ -21,18 +21,15 @@ class DropoutLayer(LayerStruct):
         return previous_layer_act
     
     def dw(self, m, next_layer_dz, previous_layer_act):
-        previous_layer_act[self.removed_index, :] = 0
         return 1/m * np.dot(next_layer_dz, previous_layer_act.T)
 
     def db(self, m, next_layer_dz):
         return 1/m * np.sum(next_layer_dz, axis=1, keepdims=True)
 
     def da(self, previous_layer_act):
-        previous_layer_act[self.removed_index, :] = 0
         return previous_layer_act
 
     def dz(self, next_layer_dz, previous_layer_act):
-        next_layer_dz[self.removed_index, :] = 0
         return next_layer_dz
     
     def update(self, dw, db, lr):

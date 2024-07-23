@@ -154,8 +154,6 @@ class TestDropoutLayer(unittest.TestCase):
 
         self.dropout_layer.activate(previous_layer_act.copy())
         expected_da = previous_layer_act.copy()
-        expected_da[1, :] = 0
-        expected_da[3, :] = 0
 
         da = self.dropout_layer.da(previous_layer_act.copy())
 
@@ -169,8 +167,6 @@ class TestDropoutLayer(unittest.TestCase):
 
         self.dropout_layer.activate(previous_layer_act.copy())
         expected_dz = next_layer_dz.copy()
-        expected_dz[1, :] = 0
-        expected_dz[3, :] = 0
 
         dz = self.dropout_layer.dz(next_layer_dz.copy(), previous_layer_act.copy())
 
