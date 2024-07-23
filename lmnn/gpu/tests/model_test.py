@@ -40,9 +40,10 @@ y_test = identity_matrix[y_test[0]].T
 
 layers = [
     DenseLayer(SigmoidActivation(), RandomInitializer(), 64),
-    # DenseLayer(ReluActivation(), RandomInitializer(startegy="small"), 64),
-    DenseLayer(SigmoidActivation(), RandomInitializer(), 64),
-    OutputLayer(SoftMaxActivation(), RandomInitializer(),  10)
+    DenseLayer(ReluActivation(), XavierInitializer(strategy="normal"), 64),
+    DenseLayer(SigmoidActivation(), HeInitializer(), 64),
+    DenseLayer(ReluActivation(), XavierInitializer(strategy="uniform"), 64),
+    OutputLayer(SigmoidActivation(), RandomInitializer(),  10)
 ]
 
 model = lmnn(layers, BceLoss(), n_iter=2800, lr=0.01, patience=350, strategy="sub", sub_parts=2)
@@ -58,6 +59,7 @@ model.fit(X_train, X_test, y_train, y_test)
 
 
 y_pred = model.predict(X_train)
+y_pred = y_pred.get()
 
 print(np.unique(np.argmax(y_train, axis=0), return_counts=True))
 print(np.unique(np.argmax(y_pred, axis=0), return_counts=True))
@@ -78,15 +80,15 @@ plt.bar(3, pr, width=bar_width, label='Precision Score', color='#84A21F')
 
 plt.figure(figsize=(12, 5))
 plt.subplot(1, 2, 1)
-plt.plot(model.training_history[:, 0])
+plt.plot(model.training_history[:, 0].get())
 plt.title('Loss Curve')
 plt.xlabel('Iterations')
 plt.ylabel('L')
 plt.grid(True)
 
 plt.subplot(1, 2, 2)
-plt.plot(range(model.training_history[:, 1].shape[0]), model.training_history[:, 1], color=('green', 0.5), label='Training accuracy')
-plt.plot(range(model.training_history[:, 2].shape[0]), model.training_history[:, 2], color=('orange', 0.5),  label='Test accuracy')
+plt.plot(range(model.training_history[:, 1].shape[0]), model.training_history[:, 1].get(), color=('green', 0.5), label='Training accuracy')
+plt.plot(range(model.training_history[:, 2].shape[0]), model.training_history[:, 2].get(), color=('orange', 0.5),  label='Test accuracy')
 plt.title('Learning Curve')
 plt.xlabel('Iterations')
 plt.ylabel('Accuracy')
@@ -96,8 +98,8 @@ plt.show()
 
 
 ax = plt.subplot(1, 1, 1)
-plt.plot(range(model.training_history[:, 1].shape[0]), model.training_history[:, 1], color=('green', 0.5), label='Training accuracy')
-plt.plot(range(model.training_history[:, 2].shape[0]), model.training_history[:, 2], color=('orange', 0.5), label='Test accuracy')
+plt.plot(range(model.training_history[:, 1].shape[0]), model.training_history[:, 1].get(), color=('green', 0.5), label='Training accuracy')
+plt.plot(range(model.training_history[:, 2].shape[0]), model.training_history[:, 2].get(), color=('orange', 0.5), label='Test accuracy')
 ax.set_ylim(zoomy)
 ax.set_xlim(zoomx)
 plt.title('Learning Curve (zoomed)')
