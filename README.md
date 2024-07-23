@@ -1,3 +1,5 @@
+[![Python package](https://github.com/lucas066001/ManualNeuralNetwork/actions/workflows/python-package.yml/badge.svg?branch=main)](https://github.com/lucas066001/ManualNeuralNetwork/actions/workflows/python-package.yml)
+
 # LMNN: Learning Manual Neural Networks
 
 *Originally, the 'L' in LMNN stood for the first letter of my name, but after some thought, that seemed a bit too much 😉*
