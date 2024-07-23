@@ -1,4 +1,3 @@
-# he.py
 import numpy as np
 
 from lmnn.loss.struct import LossStruct

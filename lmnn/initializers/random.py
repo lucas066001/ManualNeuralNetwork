@@ -4,8 +4,8 @@ import numpy as np
 from lmnn.initializers.struct import InitializerStruct
 
 class RandomInitializer(InitializerStruct):
-    def __init__(self, startegy="classic"):
-        self.strategy = startegy
+    def __init__(self, strategy="classic"):
+        self.strategy = strategy
 
     def generate_weights(self, input_dim, output_dim):
         if self.strategy == "small": 

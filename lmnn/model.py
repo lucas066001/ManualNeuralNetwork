@@ -49,13 +49,6 @@ class lmnn():
     
     def update(self, gradients):
         for c in range(1, self.nb_layers):
-            # print("GRADIENTS-----")
-            # print(self.lr)
-            # print(gradients['dW' + str(c)].min())
-            # print(gradients['dW' + str(c)].max())
-            # print(gradients['db' + str(c)].min())
-            # print(gradients['db' + str(c)].max())
-            # print("-----")
             self.layers[c].update(gradients['dW' + str(c)], gradients['db' + str(c)], self.lr)
         return
     

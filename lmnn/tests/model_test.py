@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import numpy as np
-import matplotlib.pyplot as plt
 
 from sklearn.datasets import fetch_openml
 from sklearn.metrics import precision_score, recall_score, accuracy_score
@@ -10,6 +9,7 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import accuracy_score, recall_score, precision_score
 
 from lmnn.model import lmnn
+import matplotlib.pyplot as plt
 from lmnn.layers.structures import DropoutLayer, DenseLayer, OutputLayer
 from lmnn.activations.functions import SoftMaxActivation, SigmoidActivation, ReluActivation
 from lmnn.loss.bce import BceLoss
@@ -39,13 +39,13 @@ y_train = identity_matrix[y_train[0]].T
 y_test = identity_matrix[y_test[0]].T
 
 layers = [
-    DenseLayer(SigmoidActivation(), RandomInitializer(), 64),
-    # DenseLayer(ReluActivation(), RandomInitializer(startegy="small"), 64),
-    DenseLayer(SigmoidActivation(), RandomInitializer(), 64),
-    OutputLayer(SoftMaxActivation(), RandomInitializer(),  10)
+    DenseLayer(SigmoidActivation(), RandomInitializer(), 256),
+    DropoutLayer(),
+    DenseLayer(ReluActivation(), HeInitializer(), 64),
+    OutputLayer(SigmoidActivation(), RandomInitializer(),  10)
 ]
 
-model = lmnn(layers, BceLoss(), n_iter=2800, lr=0.01, patience=350, strategy="sub", sub_parts=2)
+model = lmnn(layers, BceLoss(), n_iter=2800, lr=0.01, patience=120, strategy="sub", sub_parts=2)
 
 #print(X_train.shape)
 #print(X_test.shape)
