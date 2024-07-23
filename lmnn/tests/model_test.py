@@ -45,7 +45,7 @@ layers = [
     OutputLayer(SigmoidActivation(), RandomInitializer(),  10)
 ]
 
-model = lmnn(layers, BceLoss(), n_iter=2800, lr=0.01, patience=120, strategy="sub", sub_parts=2)
+model = lmnn(layers, BceLoss(), n_iter=2800, lr=0.01, patience=900, strategy="sub", sub_parts=2)
 
 #print(X_train.shape)
 #print(X_test.shape)
