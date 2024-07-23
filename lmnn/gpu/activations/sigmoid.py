@@ -1,5 +1,4 @@
-# dense.py
-import numpy as np
+import cupy as cp
 
 from lmnn.activations.struct import ActivationStruct
 
@@ -8,8 +7,10 @@ class SigmoidActivation(ActivationStruct):
         super().__init__()
 
     def activate(self, Z):
-        sig = 1 / (1 + np.exp(-Z))
+        # Application de la fonction sigmoïde sur le GPU
+        sig = 1 / (1 + cp.exp(-Z))
         return sig
     
     def da(self, previous_layer_act):
+        # Derivée de la fonction sigmoïde sur le GPU
         return previous_layer_act * (1 - previous_layer_act)

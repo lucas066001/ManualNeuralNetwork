@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-from sklearn.model_selection import train_test_split
-from .layers.struct import LayerStruct
-from .loss.struct import LossStruct
 from tqdm import tqdm
-import numpy as np
-from sklearn.metrics import accuracy_score, log_loss
+import cupy as cp
 import math
+
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, log_loss
+
+from lmnn.gpu.layers.structures import LayerStruct
+from lmnn.gpu.loss.functions import LossStruct
 
 class lmnn():
     def __init__(self, layers:list[LayerStruct], loss:LossStruct, lr=0.1, n_iter=1000, test_size=0.2, strategy="full", sub_parts=5, patience=50):
@@ -17,7 +19,7 @@ class lmnn():
         self.strategy = strategy
         self.sub_parts = sub_parts
         self.nb_layers = len(layers)
-        self.training_history = np.zeros((int(self.n_iter), 3))
+        self.training_history = cp.zeros((int(self.n_iter), 3))
         self.patience = patience
         self.loss = loss
         self.X_train = None
@@ -53,6 +55,7 @@ class lmnn():
         return
     
     def predict(self, X):
+        X = cp.asarray(X)
         activations = self.forward_propagation(X)
         Af = activations['A' + str(self.nb_layers - 1)]
         return Af >= 0.5
@@ -60,14 +63,20 @@ class lmnn():
     def save_results(self, i, Af, X_train, y_train):
         # calcul du log_loss et de l'accuracy
         test = self.loss.compute_loss(Af, y_train)
-        self.training_history[i, 0] = np.mean(test)
+        self.training_history[i, 0] = cp.mean(test)
         y_pred_train = self.predict(X_train)
         y_pred_test = self.predict(self.X_test)
-        self.training_history[i, 1] = (accuracy_score(np.argmax(y_train, axis=0), np.argmax(y_pred_train, axis=0)))
-        self.training_history[i, 2] = (accuracy_score(np.argmax(self.y_test, axis=0), np.argmax(y_pred_test, axis=0)))
+        self.training_history[i, 1] = (accuracy_score(cp.argmax(y_train, axis=0).get(), cp.argmax(y_pred_train, axis=0).get()))
+        self.training_history[i, 2] = (accuracy_score(cp.argmax(self.y_test, axis=0).get(), cp.argmax(y_pred_test, axis=0).get()))
 
     def fit(self, X_train, X_test, y_train, y_test):
-        self.X_train, self.X_test, self.y_train, self.y_test = X_train, X_test, y_train, y_test
+        # self.X_train, self.X_test, self.y_train, self.y_test = X_train, X_test, y_train, y_test
+
+        self.X_train = cp.asarray(X_train)
+        self.X_test = cp.asarray(X_test)
+        self.y_train = cp.asarray(y_train)
+        self.y_test = cp.asarray(y_test)
+
 
         if(self.strategy == "full"):
             for i in tqdm(range(self.n_iter)):
@@ -80,15 +89,17 @@ class lmnn():
                     break
 
         elif(self.strategy == "sub"):
-            #Not corrected 
-            self.n_iter = (np.floor(self.n_iter / self.sub_parts)).astype(int)
+            self.n_iter = (cp.floor(self.n_iter / self.sub_parts)).astype(int)
             portion = 1 / self.sub_parts
             nb_element_sub_train = math.floor(self.X_train.shape[1] * portion)
             
             e = 0
             early_stop = False
-            for i in tqdm(range(self.n_iter -1 )):
-                for x in range(0, self.sub_parts):
+            # print("range(self.n_iter)")
+            # print(type(self.n_iter))
+            # print(range(self.n_iter))
+            for i in tqdm(range(int(self.n_iter - 1) )):
+                for x in range(0, int(self.sub_parts)):
                     e+=1
                     start_train_index = nb_element_sub_train * x
                     end_train_index = nb_element_sub_train * (x+1)

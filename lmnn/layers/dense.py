@@ -1,8 +1,9 @@
 # dense.py
-from .struct import LayerStruct
 import numpy as np
-from ..activations.struct import ActivationStruct
-from ..initializers.struct import InitializerStruct
+
+from lmnn.layers.struct import LayerStruct
+from lmnn.activations.struct import ActivationStruct
+from lmnn.initializers.struct import InitializerStruct
 
 class DenseLayer(LayerStruct):
     def __init__(self, activation:ActivationStruct, initializer:InitializerStruct, nb_neurons:int=8):

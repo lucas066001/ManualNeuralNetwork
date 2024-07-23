@@ -1,5 +1,5 @@
 # dropout.py
-import numpy as np
+import cupy as cp
 import math
 import random
 
@@ -22,10 +22,10 @@ class DropoutLayer(LayerStruct):
     
     def dw(self, m, next_layer_dz, previous_layer_act):
         previous_layer_act[self.removed_index, :] = 0
-        return 1/m * np.dot(next_layer_dz, previous_layer_act.T)
+        return 1/m * cp.dot(next_layer_dz, previous_layer_act.T)
 
     def db(self, m, next_layer_dz):
-        return 1/m * np.sum(next_layer_dz, axis=1, keepdims=True)
+        return 1/m * cp.sum(next_layer_dz, axis=1, keepdims=True)
 
     def da(self, previous_layer_act):
         previous_layer_act[self.removed_index, :] = 0

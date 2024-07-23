@@ -1,5 +1,4 @@
-# random.py
-import numpy as np
+import cupy as cp
 
 from lmnn.initializers.struct import InitializerStruct
 
@@ -8,9 +7,9 @@ class RandomInitializer(InitializerStruct):
         self.strategy = strategy
 
     def generate_weights(self, input_dim, output_dim):
-        if self.strategy == "small": 
-            return np.random.rand(output_dim, input_dim)
+        if self.strategy == "small":
+            return cp.random.rand(output_dim, input_dim)
         elif self.strategy == "classic":
-            return np.random.randn(output_dim, input_dim)
+            return cp.random.randn(output_dim, input_dim)
         else:
             raise ValueError("Unsupported strategy for random initializer")
