@@ -1,2 +1,2 @@
 numpy==1.26 
-sklearn
+sklearn==1.5.1
