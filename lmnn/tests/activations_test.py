@@ -74,5 +74,22 @@ class TestReluActivation(unittest.TestCase):
         expected_output = np.array([0, 1, 1])
         np.testing.assert_equal(self.activation.da(previous_layer_act), expected_output)
 
+class TestSoftMaxActivation(unittest.TestCase):
+    def setUp(self):
+        self.activation = SoftMaxActivation()
+
+    def test_activate(self):
+        Z = np.array([[1, 2, 3], [1, -1, 0]])
+        expected = np.array([
+            [0.09003057, 0.24472847, 0.66524096],
+            [0.65900114, 0.08894621, 0.25205265]
+        ])
+        np.testing.assert_almost_equal(self.activation.activate(Z), expected, decimal=2)
+
+    def test_da(self):
+        S = np.array([[0.3, 0.4, 0.3]])
+        expected = np.array([[1,1,1]])
+        np.testing.assert_almost_equal(self.activation.da(S), expected, decimal=5)
+
 if __name__ == '__main__':
     unittest.main()

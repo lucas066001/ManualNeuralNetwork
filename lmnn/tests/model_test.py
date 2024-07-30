@@ -39,13 +39,14 @@ y_train = identity_matrix[y_train[0]].T
 y_test = identity_matrix[y_test[0]].T
 
 layers = [
-    DenseLayer(SigmoidActivation(), RandomInitializer(), 256),
+    DenseLayer(SigmoidActivation(), RandomInitializer(), 64),
     DropoutLayer(),
     DenseLayer(ReluActivation(), HeInitializer(), 64),
-    OutputLayer(SigmoidActivation(), RandomInitializer(),  10)
+    DenseLayer(SigmoidActivation(), RandomInitializer(), 64),
+    OutputLayer(SoftMaxActivation(), RandomInitializer(),  10)
 ]
 
-model = lmnn(layers, BceLoss(), n_iter=2800, lr=0.01, patience=900, strategy="sub", sub_parts=2)
+model = lmnn(layers, BceLoss(), n_iter=2800, lr=0.01, patience=120, strategy="sub", sub_parts=2)
 
 #print(X_train.shape)
 #print(X_test.shape)
